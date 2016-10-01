@@ -4,53 +4,47 @@
 #include <stdio.h>
 #include <string.h>
 
+
+
+#define LSH_TOK_DELIM " \t\r\n\a"
+char **split_line(char *line)
+{
+    int bufsize = 1024, pos= 0;
+    char **tokens = malloc(1024 * sizeof(char*));
+    char *token;
+
+    if (!tokens) {
+        fprintf(stderr, "lsh: allocation error\n");
+        exit(EXIT_FAILURE);
+    }
+    token = strtok(line, LSH_TOK_DELIM);
+    while (token != NULL) {
+        tokens[position] = token;
+        position++;
+        if (position >= 1024) {
+            fprintf(stderr, "ve482sh: Too long input\n");
+            exit(EXIT_FAILURE);
+        }
+        token = strtok(NULL, LSH_TOK_DELIM);
+    }
+    tokens[position] = NULL;
+    return tokens;
+}
+
 char *read_line(void)
 {
     //refer: Tutorial - Write a Shell in C
     const DefaultSize=64;
-    int linesize = DefaultSize;
-    int pos= 0;
-    char *line = malloc(sizeof(char) * linesize);
-    int c;
-
-    if (!line) {
-        fprintf(stderr, "lsh: allocation error\n");
-        exit(EXIT_FAILURE);
-    }
-
-    flag=true;
-
-    while (flag) {
-        // Read a character
-        c = getchar();
-        // end of line
-        if (c == EOF || c == '\n') {
-            line[pos] = '\0';
-            return line;
-        } else {
-            line[pos] = c;
-        }
-        position++;
-
-        // reallocate if too long
-        if (pos >= linesize) {
-            linesize =linesize+DefaultSize;
-            //use new_line to prevent realloc failure
-            void *new_line = realloc(line,sizeof(char) * linesize);
-            if (!new_line) {
-                fprintf(stderr, "lsh: allocation error\n");
-                free(line);
-                exit(EXIT_FAILURE);
-            }
-            line=new_line;
-        }
-    }
+    char *line = NULL;
+    ssize_t linesize = 0; // have getline allocate a buffer for us
+    getline(&line, &linesize, stdin);
+    return line;
 }
 
 void loop(void)
 {
     //refer: Tutorial - Write a Shell in C
-    //in loop we
+    //in loop the shell keeps running
     char *line;
     char **args;
     int status;
@@ -60,7 +54,7 @@ void loop(void)
         line = read_line();
         args = split_line(line);
         status = execute(args);
-
+        //free the memory for next loop
         free(line);
         free(args);
     } while (status);
