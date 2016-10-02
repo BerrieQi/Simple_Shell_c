@@ -109,7 +109,10 @@ int launch_proc(char **args)
         int i;
         for (i = 0; i < num_arg(); i++) {
             if (strcmp(args[0], com_str[i]) == 0) {
-                return (*com_func[i])(args);
+                if ((*com_func[i])(args)==0)
+                    exit(EXIT_SUCCESS);//return 0
+                else
+                    exit(EXIT_FAILURE);//return 1
             }
         }
         if (execvp(args[0],args)==-1)
