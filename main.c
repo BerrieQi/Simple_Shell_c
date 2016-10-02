@@ -150,6 +150,11 @@ int cd(char **args)
     return 1;
 }
 
+int ls(char **args)
+{
+    return 1;
+}
+
 int sh_exit(char **args)
 {
     return 0;
