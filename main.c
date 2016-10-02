@@ -9,7 +9,7 @@
 #define LSH_TOK_DELIM " \t\r\n\a"
 char **split_line(char *line)
 {
-    int bufsize = 1024, pos= 0;
+    int pos= 0;
     char **tokens = malloc(1024 * sizeof(char*));
     char *token;
 
@@ -21,7 +21,7 @@ char **split_line(char *line)
     while (token != NULL) {
         tokens[pos] = token;
         pos++;
-        if (pos >= 1024) {
+        if (1024 <= pos) {
             fprintf(stderr, "ve482sh: Too long input\n");
             exit(EXIT_FAILURE);
         }
@@ -34,7 +34,6 @@ char **split_line(char *line)
 char *read_line(void)
 {
     //refer: Tutorial - Write a Shell in C
-    const DefaultSize=64;
     char *line = NULL;
     ssize_t linesize = 0; // have getline allocate a buffer for us
     getline(&line, &linesize, stdin);
@@ -53,7 +52,7 @@ void loop(void)
         printf("$ ");
         line = read_line();
         args = split_line(line);
-        status = execute(args);
+        //status = execute(args);
         //free the memory for next loop
         free(line);
         free(args);
