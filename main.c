@@ -73,7 +73,7 @@ char **split_line(char *line)
     char *token;
 
     if (!tokens) {
-        fprintf(stderr, "lsh: allocation error\n");
+        fprintf(stderr, "Error: Allocation error\n");
         exit(EXIT_FAILURE);
     }
     token = strtok(line, TOK_DELIM);
@@ -117,13 +117,13 @@ int launch_proc(char **args)
         }
         if (execvp(args[0],args)==-1)
         {
-            perror("Error: .");
-    }
+            perror("Error");
+        }
         exit(EXIT_FAILURE);//to return 1 for status in main loop still be 1
     }
     else if (pid<0)
         {
-            perror("Error: Error forking");
+            perror("Error: Error forking.\n");
         }
         else
         {
@@ -147,7 +147,7 @@ int cd(char **args)
         fprintf(stderr, "Error: expected argument to \"cd\"\n");
     } else {
         if (chdir(args[1]) != 0) {
-            perror("Error: No such directory or access denied.\n");
+            perror("Error");
         }
     }
     return 1;
