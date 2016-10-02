@@ -19,15 +19,15 @@ char **split_line(char *line)
     }
     token = strtok(line, LSH_TOK_DELIM);
     while (token != NULL) {
-        tokens[position] = token;
-        position++;
-        if (position >= 1024) {
+        tokens[pos] = token;
+        pos++;
+        if (pos >= 1024) {
             fprintf(stderr, "ve482sh: Too long input\n");
             exit(EXIT_FAILURE);
         }
         token = strtok(NULL, LSH_TOK_DELIM);
     }
-    tokens[position] = NULL;
+    tokens[pos] = NULL;
     return tokens;
 }
 
