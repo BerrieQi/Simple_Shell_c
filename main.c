@@ -60,7 +60,7 @@ char *read_line(void)
 {
     //refer: Tutorial - Write a Shell in C / Writing Your Own Shell
     char *line = NULL;
-    ssize_t linesize = 0; // have getline allocate a buffer for us
+    size_t linesize = 0; // have getline allocate a buffer for us, ssize or size?
     getline(&line, &linesize, stdin);
     return line;
 }
@@ -95,7 +95,10 @@ int execute(char **args)
     if (args[0] == NULL) {
         return 1; //empty line
     }
-    return launch_proc(args);
+    else if (!strcmp(args[0],"exit"))
+        return 0;
+    else
+        return launch_proc(args);
 }
 
 int launch_proc(char **args)
