@@ -14,17 +14,11 @@ static char *current_base_path;
 
 //List of commands, followed by their corresponding functions.
 char *com_str[] = {
-        "cd",
         "ls",
         "cat"
 };
-//Function Declarations for builtin shell commands:
-int cd(char **args);
-int ls(char **args);
-int sh_exit(char **args);
 
-int (*com_func[]) (char **) = {
-        &cd,
+int (*com_func[]) (int argcount,char **) = {
         &ls,
         &cat
 };
@@ -65,9 +59,10 @@ void execute(char *command)
     char **args;
     args=split_line(command);
     int i;
-    for (i = 0; i < num_arg(); i++) {
+    int argumentcount=num_arg();
+    for (i = 0; i < argumentcount; i++) {
         if (strcmp(args[0], com_str[i]) == 0) {
-            (*com_func[i])(args);
+            (*com_func[i])(argumentcount,args);
             exit(EXIT_FAILURE);//if it is internal command
         }
     }
@@ -79,7 +74,7 @@ void execute(char *command)
         strcat(path,args[0]);//write the complete path to the external function
         if (execv(path,args)<0)
         {
-            perror("Command not found!\n");
+            perror("Command not found ");
             exit(EXIT_FAILURE);
         }
     }
@@ -118,16 +113,30 @@ void parse_command(char *command)
                 perror("fork");
             }
         }
-        else if ((*split)=='>')
+        else if ((*split)=='>')//">"
         {
             *split=0;//another cut
             char *fout_name=malloc(MAX_ADDR);
             sscanf(split+1,"%s",fout_name);
+            if (fout_name==NULL)
+            {
+                perror("Please check output file name ");
+                return;
+            }
             int fout;
             fout = open(fout_name, O_RDWR | O_CREAT | O_TRUNC, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH| S_IWOTH);
-            close(STDOUT_FILENO);
-            dup(fout);
-            parse_command(command);//after set output to file then continue
+            if (fout==-1)
+            {
+                perror("Cannot create or open target file ");
+                return;
+            } else
+            {
+                close(STDOUT_FILENO);
+                dup(fout);
+                parse_command(command);//after set output to file then continue
+                return;
+            }
+
         } else//"<"
         {
             *split=0;//another cut
@@ -147,13 +156,15 @@ void parse_command(char *command)
             fin = open(fin_name,O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH| S_IWOTH);
             if (fin==-1)
             {
-                perror("Open input file Error\n");
-                exit(EXIT_FAILURE);
+                perror("Open input file error ");
+                return;
+            } else
+            {
+                close(STDIN_FILENO);
+                dup(fin);
+                parse_command(command);
+                return;
             }
-            close(STDIN_FILENO);
-            dup(fin);
-            parse_command(command);
-            return;
         }
     } else
     {
@@ -187,8 +198,16 @@ int main()
     {
         printf("ve482sh $ ");
         fgets(command,MAX_LINE_CHAR,stdin);
-        sscanf(command,"%s",ifexit);
+        char *mightpath=malloc(MAX_ADDR);
+        sscanf(command,"%s%s",ifexit,mightpath);
+        int isCD=0;
         if (!strcmp(ifexit,"exit")) exit(EXIT_SUCCESS);//exit the shell
-        parse_command(command);
+            else
+                if (!strcmp(ifexit,"cd"))
+                {
+                    cd(mightpath);
+                    isCD=1;
+                }
+        if (!isCD) parse_command(command);
     }while (1);
 }

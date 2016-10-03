@@ -6,9 +6,13 @@
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
+#include <sys/stat.h>
+#include <time.h>
+#include <dirent.h>
+#include <stdbool.h>
 
-int cd(char **args);
-int ls(char **args);
-int cat(char **args);
+int cd(char *args);
+int ls(int argcount,char **args);
+int cat(int argcount,char **args);
 
 #endif //VE482P1_CMDS_H
