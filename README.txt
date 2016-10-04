@@ -17,8 +17,8 @@ Functions and User Guideline
 6. With Ctrl+d or type command exit, it will do clean exit without memory leak;
 7. Pipe composed with file I/O redirection (e.g. cat < 1.txt — sort -R > 2.txt);
 8. Wait for command to be completed when encountering > or |;
-9. Handle Quotation mark;
-10. Catch syntax error;
+9. Handle Quotation mark as whole part;
+10. Catch syntax error like cat <;
 11. Change working directory;
 12. Press Ctrl C to exit current process.
 
