@@ -15,12 +15,16 @@ static char *current_base_path;
 //List of commands, followed by their corresponding functions.
 char *com_str[] = {
         "ls",
-        "cat"
+        "cat",
+        "pwd",
+        "echo"
 };
 
 int (*com_func[]) (int ,char **, int *) = {
         &ls,
-        &cat
+        &cat,
+        &pwd,
+        &echo
 };
 
 int num_arg()
@@ -29,29 +33,39 @@ int num_arg()
 }
 
 #define TOK_DELIM " \t\n\r\a"
-char **split_line(char *line, int *args_num)
-{
-    int pos= 0;
+char **split_line(char *line, int *args_num) {
+    int pos = 0;
     //According to the project, one line is no more than 1024 characters
-    char **tokens = malloc(1024 * sizeof(char*));
+    char **tokens = malloc(1024 * sizeof(char *));
     char *token;
 
     if (!tokens) {
         fprintf(stderr, "Error: Allocation error\n");
         exit(EXIT_FAILURE);
     }
-    token=strtok(line, TOK_DELIM);
-    while (token != NULL) {
-        tokens[pos] = token;
+    char *check_first = malloc(MAX_LINE_CHAR);
+    sscanf(line, "%s", check_first);
+    if (!strcmp(check_first, "echo")) {
+        tokens[pos]="echo";
         pos++;
-        if (1024 <= pos) {
-            fprintf(stderr, "ve482sh: Too long input\n");
-            exit(EXIT_FAILURE);
+        size_t slen=strlen(line);
+        char *line_start=strchr(line,'e');
+        strncmp(tokens[pos],line_start+4,slen-4);
+        pos++;
+    } else {
+        token = strtok(line, TOK_DELIM);
+        while (token != NULL) {
+            tokens[pos] = token;
+            pos++;
+            if (1024 <= pos) {
+                fprintf(stderr, "ve482sh: Too long input\n");
+                exit(EXIT_FAILURE);
+            }
+            token = strtok(NULL, TOK_DELIM);
         }
-        token = strtok(NULL, TOK_DELIM);
     }
     tokens[pos] = NULL;
-    *args_num=pos;
+    *args_num = pos;
     return tokens;
 }
 

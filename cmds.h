@@ -14,5 +14,7 @@
 int cd(char *args);
 int ls(int argcount,char **args, int *redir);
 int cat(int argcount,char **args, int *redir);
+int pwd(int argcount,char **args, int *redir);
+int echo(int argcount,char **args, int *redir);
 
 #endif //VE482P1_CMDS_H
