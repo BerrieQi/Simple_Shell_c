@@ -12,7 +12,7 @@
 #include <stdbool.h>
 
 int cd(char *args);
-int ls(int argcount,char **args);
-int cat(int argcount,char **args);
+int ls(int argcount,char **args, int *redir);
+int cat(int argcount,char **args, int *redir);
 
 #endif //VE482P1_CMDS_H
