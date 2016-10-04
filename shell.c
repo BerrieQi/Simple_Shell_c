@@ -34,26 +34,58 @@ int num_arg()
 
 #define TOK_DELIM " \t\n\r\a"
 char **split_line(char *line, int *args_num) {
-    int pos = 0;
+    int pos= 0;
     //According to the project, one line is no more than 1024 characters
-    char **tokens = malloc(1024 * sizeof(char *));
-    char *token;
-
+    char **tokens = malloc(1024 * sizeof(char*));
     if (!tokens) {
         fprintf(stderr, "Error: Allocation error\n");
         exit(EXIT_FAILURE);
     }
-    char *check_first = malloc(MAX_LINE_CHAR);
-    sscanf(line, "%s", check_first);
-    if (!strcmp(check_first, "echo")) {
-        tokens[pos]="echo";
+    char *token;
+    char *quote;
+    char *quote_2;
+    quote=strchr(line,'\"');
+    if (quote)//find first "
+    {
+        *quote=0;//cut at the first place
+        quote_2=strchr(quote+1,'\"');
+        if (!quote_2)//cannot find another "
+        {
+            int ifinput=1;
+            char *temp_char=malloc(MAX_LINE_CHAR);
+            while (ifinput)
+            {
+                int n=MAX_LINE_CHAR;
+                printf("> ");
+                fgets(temp_char,n,stdin);
+                quote_2=strchr(temp_char,'\"');
+                if (quote_2)
+                {
+                    ifinput=0;
+                    *quote_2=0;
+                }
+                strcat(quote+1,temp_char);
+            }
+        } else
+        {
+            *quote_2=0;//cut at the second place
+        }
+    }
+    token=strtok(line, TOK_DELIM);
+    while (token != NULL) {
+        tokens[pos] = token;
         pos++;
-        size_t slen=strlen(line);
-        char *line_start=strchr(line,'e');
-        strncmp(tokens[pos],line_start+4,slen-4);
+        if (1024 <= pos) {
+            fprintf(stderr, "ve482sh: Too long input\n");
+            exit(EXIT_FAILURE);
+        }
+        token = strtok(NULL, TOK_DELIM);
+    }
+    if (quote)
+    {
+        tokens[pos]=quote+1;
         pos++;
-    } else {
-        token = strtok(line, TOK_DELIM);
+        token=strtok(quote_2+1, TOK_DELIM);//possible run time error
         while (token != NULL) {
             tokens[pos] = token;
             pos++;
@@ -63,9 +95,13 @@ char **split_line(char *line, int *args_num) {
             }
             token = strtok(NULL, TOK_DELIM);
         }
+        tokens[pos]=NULL;
+    } else
+    {
+        tokens[pos] = NULL;
     }
-    tokens[pos] = NULL;
-    *args_num = pos;
+
+    *args_num=pos;
     return tokens;
 }
 

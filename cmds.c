@@ -2,6 +2,7 @@
 
 #define MAX_ADDR 512
 #define BUFFER_SIZE 4096
+#define MAX_LINE_CHAR 1024
 
 int cd(char *args)
 {
@@ -118,77 +119,6 @@ int pwd(int argcount,char **args, int *redir)
 
 int echo(int argcount,char **args, int *redir)//"" space
 {
-    int pos= 0;
-    //According to the project, one line is no more than 1024 characters
-    char **tokens = malloc(1024 * sizeof(char*));
-    if (!tokens) {
-        fprintf(stderr, "Error: Allocation error\n");
-        exit(EXIT_FAILURE);
-    }
-    char *token;
-    char *quote;
-    char *quote_2;
-    quote=strchr(line,'\"');
-    if (quote)//find first "
-    {
-        *quote=0;//cut at the first place
-        quote_2=strchr(quote+1,'\"');
-        if (!quote_2)//cannot find another "
-        {
-            int ifinput=1;
-            char *temp_char=malloc(MAX_LINE_CHAR);
-            while (ifinput)
-            {
-                int n=MAX_LINE_CHAR;
-                printf("> ");
-                fgets(temp_char,n,STDIN_FILENO);
-                quote_2=strchr(temp_char,'\"');
-                if (quote_2)
-                {
-                    ifinput=0;
-                    *quote_2=0;
-                }
-                strcat(quote+1,temp_char);
-            }
-        } else
-        {
-            *quote_2=0;//cut at the second place
-        }
-    }
-    token=strtok(line, TOK_DELIM);
-    while (token != NULL) {
-        tokens[pos] = token;
-        pos++;
-        if (1024 <= pos) {
-            fprintf(stderr, "ve482sh: Too long input\n");
-            exit(EXIT_FAILURE);
-        }
-        token = strtok(NULL, TOK_DELIM);
-    }
-    if (quote)
-    {
-        tokens[pos]=quote+1;
-        pos++;
-        token=strtok(quote_2+1, TOK_DELIM);//possible run time error
-        while (token != NULL) {
-            tokens[pos] = token;
-            pos++;
-            if (1024 <= pos) {
-                fprintf(stderr, "ve482sh: Too long input\n");
-                exit(EXIT_FAILURE);
-            }
-            token = strtok(NULL, TOK_DELIM);
-        }
-        tokens[pos]=NULL;
-    } else
-    {
-        tokens[pos] = NULL;
-    }
-
-    *args_num=pos;
-    return tokens;
-
-
     int i;
     for (i=1;i<argcount;i++)
         printf("%s",args[i]);
