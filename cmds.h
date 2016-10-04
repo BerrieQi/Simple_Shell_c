@@ -16,5 +16,7 @@ int ls(int argcount,char **args, int *redir,int *ifpipe);
 int cat(int argcount,char **args, int *redir,int *ifpipe);
 int pwd(int argcount,char **args, int *redir,int *ifpipe);
 int echo(int argcount,char **args, int *redir,int *ifpipe);
+int sh_mkdir(int argcount,char **args, int *redir,int *ifpipe);
+int rm(int argcount,char **args, int *redir,int *ifpipe);
 
 #endif //VE482P1_CMDS_H

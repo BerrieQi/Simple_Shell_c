@@ -13,10 +13,27 @@ int cd(char *args)
             perror("Error");
         }
     }
-    /*char *wd=malloc(100);
-    getcwd(wd,MAX_ADDR);
-    printf("%s\n",wd);*/
     return 1;
+}
+
+int rm(int argcount,char **args, int *redir,int *ifpipe)
+{
+    char* path = args[1];
+    char* conf=malloc(20);
+    printf("romve %s , you sure ?[y/n]:",path);
+    scanf("%s",conf);
+    if(conf[0]=='Y' || conf[0]=='y') remove(path);
+        else exit(0);
+    free(conf);
+    return 0;
+}
+
+int sh_mkdir(int argcount,char **args, int *redir,int *ifpipe)
+{
+    if(argcount==1)exit(0);
+    if(mkdir(args[1],0666)<0)
+        printf("make dictionary failed!\n");
+    return 0;
 }
 
 void mode_format( int mode , char* str )

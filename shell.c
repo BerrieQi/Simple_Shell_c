@@ -20,14 +20,18 @@ char *com_str[] = {
         "ls",
         "cat",
         "pwd",
-        "echo"
+        "echo",
+        "mkdir",
+        "rm"
 };
 
 int (*com_func[]) (int ,char **, int *, int *) = {
         &ls,
         &cat,
         &pwd,
-        &echo
+        &echo,
+        &sh_mkdir,
+        &rm
 };
 
 int num_arg()
@@ -156,6 +160,19 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
     {
         if ((*split)=='|') {
             *split = 0;//set a split sign \0
+            /**********************************memory and here
+            char *next_fore=malloc(MAX_ADDR);
+            if (sscanf(split+1,"%s",next_fore)<=0 && sscanf(command,"%s",temp_cmd)>0)
+            {
+                int ifinput=1;
+                while (ifinput)
+                {
+                    printf("> ");
+                    if (scanf("%s",next_fore)>0) ifinput=0;
+                    getchar();//get the enter
+                }
+            }
+               */
             int file_dscp[2];
             pipe(file_dscp);
             int pid = fork();
