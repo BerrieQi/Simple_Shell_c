@@ -37,7 +37,7 @@ void mode_format( int mode , char* str )
 }
 
 
-int ls(int argcount,char **args, int *redir)
+int ls(int argcount,char **args, int *redir,int *ifpipe)
 {
     char *path=malloc(MAX_ADDR);
     getcwd(path,MAX_ADDR);
@@ -86,12 +86,12 @@ int ls(int argcount,char **args, int *redir)
     return 0;
 }
 
-int cat(int argcount,char **args, int *redir)
+int cat(int argcount,char **args, int *redir,int *ifpipe)
 {
     int fd;
     char *buf = malloc(BUFFER_SIZE);
     int fsize;
-    if ((*redir)==0)
+    if ((*redir)==0 && (*ifpipe)==0)
     {
         if((fd = open(args[1],O_RDONLY))<0)
         {
@@ -109,7 +109,7 @@ int cat(int argcount,char **args, int *redir)
     return 1;
 }
 
-int pwd(int argcount,char **args, int *redir)
+int pwd(int argcount,char **args, int *redir,int *ifpipe)
 {
     char* path = malloc(MAX_ADDR);
     printf("%s\n",getcwd(path,MAX_ADDR));
@@ -117,11 +117,20 @@ int pwd(int argcount,char **args, int *redir)
     return 0;
 }
 
-int echo(int argcount,char **args, int *redir)//"" space
+int echo(int argcount,char **args, int *redir,int *ifpipe)//"" space
 {
-    int i;
-    for (i=1;i<argcount;i++)
-        printf("%s",args[i]);
-    printf("\n");
-    return 0;
+    if ((*redir)==1)
+    {
+        char *buf;
+        buf = malloc(BUFSIZ);
+        read(STDIN_FILENO,buf,MAX_LINE_CHAR);
+        write(STDOUT_FILENO,buf,MAX_LINE_CHAR);
+    }
+    else {
+        int i;
+        for (i = 1; i < argcount; i++)
+            printf("%s", args[i]);
+        printf("\n");
+        return 0;
+    }
 }

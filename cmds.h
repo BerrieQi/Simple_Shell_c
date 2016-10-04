@@ -12,9 +12,9 @@
 #include <stdbool.h>
 
 int cd(char *args);
-int ls(int argcount,char **args, int *redir);
-int cat(int argcount,char **args, int *redir);
-int pwd(int argcount,char **args, int *redir);
-int echo(int argcount,char **args, int *redir);
+int ls(int argcount,char **args, int *redir,int *ifpipe);
+int cat(int argcount,char **args, int *redir,int *ifpipe);
+int pwd(int argcount,char **args, int *redir,int *ifpipe);
+int echo(int argcount,char **args, int *redir,int *ifpipe);
 
 #endif //VE482P1_CMDS_H
