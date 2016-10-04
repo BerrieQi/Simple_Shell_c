@@ -39,7 +39,7 @@ int ls(int argcount,char **args)
     DIR *dir;
 
 
-    return 1;
+    return 0;
 }
 
 #define BUFFER_SIZE 4096
