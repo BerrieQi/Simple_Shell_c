@@ -96,10 +96,13 @@ int ls(int argcount,char **args, int *redir,int *ifpipe)
             char *buf=malloc(11);
             mode_format(state.st_mode,buf);
             printf("%s\t%s\t%ld\t%s \n",buf,change_time,state.st_size,rddir->d_name);
+            free(change_time);
+            free(buf);
         }
     }
     printf("\n");
     closedir(dir);
+    free(path);
     return 0;
 }
 
@@ -123,6 +126,7 @@ int cat(int argcount,char **args, int *redir,int *ifpipe)
     }
     write(STDOUT_FILENO,buf,fsize);
     close(fd);
+    free(buf);
     return 1;
 }
 
@@ -142,6 +146,8 @@ int echo(int argcount,char **args, int *redir,int *ifpipe)//"" space
         buf = malloc(BUFSIZ);
         read(STDIN_FILENO,buf,MAX_LINE_CHAR);
         write(STDOUT_FILENO,buf,MAX_LINE_CHAR);
+        free(buf);
+        return 0;
     }
     else {
         int i;

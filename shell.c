@@ -80,6 +80,7 @@ char **split_line(char *line, int *args_num, int *ifredir) {
                 }
                 strcat(quote+1,temp_char);
             }
+            free(temp_char);
         } else
         {
             *quote_2=0;//cut at the second place
@@ -143,6 +144,7 @@ void execute(char *command, int *ifredir, int *ifpipe)
         {
             perror("Command not found ");
             free(args_num);
+            free(path);
             exit(EXIT_FAILURE);
         }
     }
@@ -160,19 +162,20 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
     {
         if ((*split)=='|') {
             *split = 0;//set a split sign \0
-            /**********************************memory and here
-            char *next_fore=malloc(MAX_ADDR);
+            char *next_fore=malloc(MAX_LINE_CHAR);
             if (sscanf(split+1,"%s",next_fore)<=0 && sscanf(command,"%s",temp_cmd)>0)
             {
                 int ifinput=1;
                 while (ifinput)
                 {
                     printf("> ");
-                    if (scanf("%s",next_fore)>0) ifinput=0;
-                    getchar();//get the enter
+                    char *ifget;
+                    char pipe_temp[MAX_LINE_CHAR];
+                    ifget=fgets(next_fore,MAX_LINE_CHAR,stdin);
+                    if ( (ifget!=NULL) && (sscanf(next_fore,"%s",pipe_temp)>0)) ifinput=0;
+                    strcat(split+1,next_fore);
                 }
             }
-               */
             int file_dscp[2];
             pipe(file_dscp);
             int pid = fork();
@@ -223,12 +226,14 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
             if (fout==-1)
             {
                 perror("Cannot create or open target file ");
+                free(fout_name);
                 return;
             } else
             {
                 close(STDOUT_FILENO);
                 dup(fout);
                 parse_command(command,ifredir,ifpipe);//after set output to file then continue
+                free(fout_name);
                 return;
             }
 
@@ -247,13 +252,13 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
                 sscanf(split+1,"%s",fin_name);
                 *split_2=temp;
                 strcat(command,split_2);
-                //might need to first take out then do modification
             } else sscanf(split+1,"%s",fin_name);
             int fin;
             fin = open(fin_name,O_RDONLY, S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH| S_IWOTH);
             if (fin==-1)
             {
                 perror("Open input file error ");
+                free(fin_name);
                 return;
             } else
             {
@@ -261,6 +266,7 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
                 close(STDIN_FILENO);
                 dup(fin);
                 parse_command(command,ifredir,ifpipe);
+                free(fin_name);
                 return;
             }
         }
@@ -275,8 +281,6 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
         {
             int *status=NULL;
             //redirect the input and output and set pipe to not
-            //bug here, too early to reset pipe or redirection
-            //still bug about <>|
             *ifredir=0;
             *ifpipe=0;
             dup2(stdin_fd,STDIN_FILENO);
@@ -287,6 +291,7 @@ void parse_command(char *command, int *ifredir, int *ifpipe)
             perror("fork");
         }
     }
+    free(temp_cmd);
     return;
 }
 
@@ -298,7 +303,6 @@ int main()
     stdout_fd=dup(STDOUT_FILENO);
     char *command=malloc(MAX_LINE_CHAR);
     char *ifexit=malloc(MAX_LINE_CHAR);
-    current_base_path=malloc(MAX_LINE_CHAR);
     current_base_path="/usr/bin";
     signal(SIGINT,Kill_all);
     do
@@ -315,11 +319,22 @@ int main()
         if (getline(&command,&char_num,stdin)<0)//ctrl D
         {
             printf("\n");
+            free(command);
+            free(ifexit);
+            free(ifredir);
+            free(ifpipe);
             break;
         }
         sscanf(command,"%s%s",ifexit,mightpath);
         int isCD=0;
-        if (!strcmp(ifexit,"exit")) exit(EXIT_SUCCESS);//exit the shell
+        if (!strcmp(ifexit,"exit"))
+        {
+            free(command);
+            free(ifexit);
+            free(ifredir);
+            free(ifpipe);
+            exit(EXIT_SUCCESS);
+        }//exit the shell
         else
         if (!strcmp(ifexit,"cd"))
         {
